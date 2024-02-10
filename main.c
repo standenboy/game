@@ -1,7 +1,10 @@
-#include<raylib.h>
-#include<stdlib.h>
-#include<stdio.h>
+#include <raylib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+
 #include "types.h"
+#include "network.h"
 
 float difference(float num1, float num2){
 	float diff = num1 - num2;
@@ -11,11 +14,12 @@ float difference(float num1, float num2){
 	return diff;
 }
 
-int main(){
+int main(int argc, char *argv[]){
 	struct window WIN;
-	WIN.height = 1920;
+	WIN.height = 1920 / 2;
 	WIN.width = 1080;
 	WIN.name = "the worlds best game";
+	
 	InitWindow(WIN.height, WIN.width, WIN.name); 
 
 	SetTargetFPS(60);
@@ -25,16 +29,53 @@ int main(){
 	PlayMusicStream(music);
 
 	GameScreen game = TITLE;
-
+	
 	struct player PLAY;
 	PLAY.size = 10;
-	PLAY.color = PINK;
-	PLAY.x = 100;
-	PLAY.y = 100;
 	PLAY.deltaV = 1;
 
-	struct enemy ENEMYS;
+	if (strcmp(argv[1], "purple") == 0){
+		PLAY.color = PURPLE;
+	}else if(strcmp(argv[1], "green") == 0){
+		PLAY.color = GREEN;
+	}else{
+		PLAY.color = PINK;
+	}
+
+	struct player PLAY2;
+	PLAY2.size = 10;
+	PLAY2.x = 0;
+	PLAY2.y = 0; 
+	PLAY2.deltaV = 1;
+
+	int sockfd = connectToServer();
+	char *amIFirst = malloc(256);
 	
+	char *color = malloc(256);
+	
+	recv(sockfd, amIFirst, 256, 0);
+	if (strcmp(amIFirst, "first") == 0){
+		sendColor(argv[1], sockfd);
+		color = recvColor(sockfd);	
+	}else{
+		color = recvColor(sockfd);	
+		sendColor(argv[1], sockfd);
+	}
+	
+	free(amIFirst);
+
+	if (strcmp(color, "purple") == 0){
+		PLAY2.color = PURPLE;
+	}else if(strcmp(color, "green") == 0){
+		PLAY2.color = GREEN;
+	}else{
+		PLAY2.color = PINK;
+	}
+	
+	free(color);
+	
+	
+
 	while (!WindowShouldClose()){
 		// drawing
 		BeginDrawing();
@@ -42,12 +83,16 @@ int main(){
 			case TITLE:
 				ClearBackground(WHITE);
 				DrawText("press enter to play", WIN.height/2 - 150, WIN.width/2, 30, BLACK);
+				PLAY.x = GetRandomValue(0, WIN.width);
+				PLAY.y = GetRandomValue(0, WIN.height);
 				break;
 
 			case GAMEPLAY:
-				ClearBackground(BLUE);
+				ClearBackground(BLACK);
+				
 				DrawCircle(PLAY.x, PLAY.y, PLAY.size, PLAY.color);	
-				DrawCircle(ENEMYS.x, ENEMYS.y, ENEMYS.size, ENEMYS.color);
+				DrawCircle(PLAY2.x, PLAY2.y, PLAY2.size, PLAY2.color);
+
 				break;
 			
 			default: break;
@@ -59,12 +104,6 @@ int main(){
 			case TITLE:
 				if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP)){
                     			game = GAMEPLAY;
-					
-					ENEMYS.size = 20;
-					ENEMYS.color = BROWN;
-					ENEMYS.x = GetRandomValue(0, WIN.width);
-					ENEMYS.y = GetRandomValue(0, WIN.height);
-					ENEMYS.speed = 0.5;
                 		}
 				break;
 
@@ -103,32 +142,32 @@ int main(){
 				}else if(PLAY.y > 1080){
 					PLAY.y = 1080;
 				}
+				
+				char *recived = malloc(256); 
+				recived	= sendAndRecive(PLAY.x, PLAY.y, sockfd);
 
-				if (PLAY.x > ENEMYS.x){
-					ENEMYS.x += 1 * ENEMYS.speed;
-				} 
-				if (PLAY.y > ENEMYS.y){
-					ENEMYS.y += 1 * ENEMYS.speed;
-				}
-				if (PLAY.x < ENEMYS.x){
-					ENEMYS.x -= 1 * ENEMYS.speed;
-				}
-				if (PLAY.y < ENEMYS.y){
-					ENEMYS.y -= 1 * ENEMYS.speed;
+				char *ch;
+				ch = strtok(recived,":");
+				int counter = 0;
+				while (ch != NULL){
+					if (counter == 0){
+						PLAY2.x = atoi(ch);
+					}else{
+						PLAY2.y = atoi(ch);
+					}
+					ch = strtok(NULL, ":");
+					counter++;
 				}
 				
-							
-				float oldSpeed = ENEMYS.speed;
-
-				do {
-					ENEMYS.speed = (float)GetRandomValue(1,6) / 2;
-				}while (difference(ENEMYS.speed, oldSpeed) < 1);
-
-				if (difference(PLAY.x, ENEMYS.x) < 10){ 
-					if (difference(PLAY.y, ENEMYS.y) < 10){
+				free(recived);
+				
+				if (difference(PLAY.x, PLAY2.x) < 10){
+					if (difference(PLAY.y, PLAY2.y) < 10){
 						game = TITLE;
 				      	}
 				}
+
+				
 
 				break;
 			
