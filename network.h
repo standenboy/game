@@ -31,12 +31,3 @@ char *sendAndRecive(int x, int y, int sockfd){
 	return buffer;
 }
 
-void sendColor(char color[], int sockfd){
-	send(sockfd, color, 255, 0);
-}
-
-char *recvColor(int sockfd){
-	char *buffer = malloc(256);
-	recv(sockfd, buffer, 255, 0);
-	return buffer;
-}

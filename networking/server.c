@@ -23,8 +23,8 @@ int main(){
 	printf("both clients connected\n");
 
 
-	send(clientfd0, "first", 255, 0);
-	send(clientfd1, "last", 255, 0);
+//	send(clientfd0, "first", 255, 0);
+//	send(clientfd1, "last", 255, 0);
 
 	struct pollfd fds[2] = { 
 		{

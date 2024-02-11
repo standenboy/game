@@ -14,9 +14,11 @@ float difference(float num1, float num2){
 	return diff;
 }
 
-int main(int argc, char *argv[]){
+int main(){
+	int sockfd = connectToServer();
+	
 	struct window WIN;
-	WIN.height = 1920 / 2;
+	WIN.height = 1920;
 	WIN.width = 1080;
 	WIN.name = "the worlds best game";
 	
@@ -33,48 +35,15 @@ int main(int argc, char *argv[]){
 	struct player PLAY;
 	PLAY.size = 10;
 	PLAY.deltaV = 1;
-
-	if (strcmp(argv[1], "purple") == 0){
-		PLAY.color = PURPLE;
-	}else if(strcmp(argv[1], "green") == 0){
-		PLAY.color = GREEN;
-	}else{
-		PLAY.color = PINK;
-	}
+	PLAY.color = PINK;
 
 	struct player PLAY2;
 	PLAY2.size = 10;
 	PLAY2.x = 0;
 	PLAY2.y = 0; 
 	PLAY2.deltaV = 1;
-
-	int sockfd = connectToServer();
-	char *amIFirst = malloc(256);
 	
-	char *color = malloc(256);
-	
-	recv(sockfd, amIFirst, 256, 0);
-	if (strcmp(amIFirst, "first") == 0){
-		sendColor(argv[1], sockfd);
-		color = recvColor(sockfd);	
-	}else{
-		color = recvColor(sockfd);	
-		sendColor(argv[1], sockfd);
-	}
-	
-	free(amIFirst);
-
-	if (strcmp(color, "purple") == 0){
-		PLAY2.color = PURPLE;
-	}else if(strcmp(color, "green") == 0){
-		PLAY2.color = GREEN;
-	}else{
-		PLAY2.color = PINK;
-	}
-	
-	free(color);
-	
-	
+	PLAY2.color = PURPLE;
 
 	while (!WindowShouldClose()){
 		// drawing
