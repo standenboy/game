@@ -10,7 +10,7 @@ int connectToServer(){
 	struct sockaddr_in address = {
 		AF_INET,
 		htons(9999),
-		address.sin_addr.s_addr = inet_addr("seacrossedlovers.xyz"),
+		address.sin_addr.s_addr = inet_addr("50.116.49.93"),
 	};
 
 	if (connect(sockfd, &address, sizeof(address)) != 0){ exit(15); }
