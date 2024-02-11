@@ -22,7 +22,10 @@ int main(){
 	WIN.width = 1080;
 	WIN.name = "the worlds best game";
 	
+
 	InitWindow(WIN.height, WIN.width, WIN.name); 
+
+	Texture2D background = LoadTexture("background.png");
 
 	SetTargetFPS(60);
 	
@@ -57,8 +60,10 @@ int main(){
 				break;
 
 			case GAMEPLAY:
-				ClearBackground(BLACK);
-				
+				ClearBackground(WHITE);
+
+				DrawTexture(background, WIN.width/4 - 250, WIN.height/4 - 400, WHITE);  
+
 				DrawCircle(PLAY.x, PLAY.y, PLAY.size, PLAY.color);	
 				DrawCircle(PLAY2.x, PLAY2.y, PLAY2.size, PLAY2.color);
 
