@@ -6,11 +6,10 @@
 int main(){
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-	struct sockaddr_in address = {
-		AF_INET,
-		htons(9999),
-		0,
-	};
+	struct sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_port = htons(9999);
+	address.sin_addr.s_addr = INADDR_ANY; 
 	
 	if(bind(sockfd, &address, sizeof(address)) != 0){ printf("failed to bind\n"); } 
 
