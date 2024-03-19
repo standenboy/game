@@ -1,3 +1,3 @@
 main:
-	cc -o game main.c -lraylib
+	cc -o game main.c -lraylib -lm
 	make networking/server

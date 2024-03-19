@@ -20,13 +20,24 @@ int connectToServer(){
 	
 char *sendAndRecive(int x, int y, int sockfd){
 
+	struct pollfd fds[1] = {
+		{
+			sockfd,
+			POLLIN,
+			0,
+		}
+	};
+
 	char *buffer = malloc(256);
 
-	char *toSend = malloc(256);
-	snprintf(toSend, 256, "%d:%d", x,y);
+	if (fds[0].revents & POLLIN){
+		char *toSend = malloc(256);
+		snprintf(toSend, 256, "%d:%d", x,y);
+		send(sockfd, toSend, 255, 0); 
+
+	}
 
 	recv(sockfd, buffer, 255, 0);
-	send(sockfd, toSend, 255, 0); 
 	
 	return buffer;
 }
